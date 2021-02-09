@@ -1,5 +1,5 @@
 //     Author: Chihiro Nakatani
-//     Februally 9th, 2021
+//     February 9th, 2021
 //     This script contains the inner product function with cpp.
 
 #include <iostream>

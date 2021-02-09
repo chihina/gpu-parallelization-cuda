@@ -20,7 +20,7 @@ void inner_product(int n, float *x, float *y, float *z)
 int main(void)
 {
     //   Define input vector length
-    int N = 10000;
+    int N = 10000000;
     std::cout << "Vector size : " << N << std::endl;  
    
     // Initialize float vectors with different float values

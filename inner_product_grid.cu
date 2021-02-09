@@ -3,6 +3,8 @@
 //     This script contains the inner product function with cpp.
 
 #include <iostream>
+#include <numeric>
+#define SIZE_OF_ARRAY(array) (sizeof(array)/sizeof(array[0]))
 
 // Define kernel function for inner product
 __global__
@@ -11,33 +13,30 @@ void inner_product(int n, float *x, float *y, float *z)
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
     for (int i = index; i < n; i += stride)
-        z[0] += x[i] * y[i];
+        z[i] = x[i] * y[i];
 }
 
 // Define main function
 int main(void)
 {
     //   Define input vector length
-    int N = 1<<20;
+    int N = 2<<10;
     std::cout << "Vector size : " << N << std::endl;  
    
-    //   Initialize a float variable
-    float *z = new float[1];
-    cudaMallocManaged(&z, 1*sizeof(float));
-    z[0] = 0;
-
     // Initialize float vectors with different float values
     float *x = new float[N];
     float *y = new float[N];
+    float *z = new float[N];
     cudaMallocManaged(&x, N*sizeof(float));
     cudaMallocManaged(&y, N*sizeof(float));
+    cudaMallocManaged(&z, N*sizeof(float));
     for (int i = 0; i < N; i++) {
-        x[i] = 1.0f;
-        y[i] = 2.0f;
+        x[i] = i;
+        y[i] = i+1;
+        z[i] = 0;
     }
 
     // Check whether Initialization is right (If you use big N, you should not check it in command line)
-    std::cout << "Initialzze scalar z: " << z[0] << std::endl;  
 
     //std::cout << "Initialize vector x: [ ";
     //for (int i = 0; i < N; i++) {
@@ -59,7 +58,8 @@ int main(void)
     // Wait for GPU to finish before accessing on host
     cudaDeviceSynchronize();
 
-    std::cout << "Inner product (z = (x,y)): " << z[0] << std::endl;
+    float inner_product_value = std::accumulate(z, z + N, 0);
+    std::cout << "Inner product (z = (x,y)): " << inner_product_value << std::endl;
 
     // Free memory which is used for vectors
     cudaFree(x);

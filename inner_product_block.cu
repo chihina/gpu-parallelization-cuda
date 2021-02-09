@@ -8,7 +8,9 @@
 __global__
 void inner_product(int n, float *x, float *y, float *z)
 {
-    for (int i = 0; i < n; i++)
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+    for (int i = index; i < n; i += stride)
         z[0] += x[i] * y[i];
 }
 
@@ -50,7 +52,7 @@ int main(void)
     //std::cout << "]" << std::endl;
 
     // Execute kernel on vector on the GPU
-    inner_product<<<1, 1>>>(N, x, y, z);
+    inner_product<<<1, 256>>>(N, x, y, z);
 
     // Wait for GPU to finish before accessing on host
     cudaDeviceSynchronize();

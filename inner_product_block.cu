@@ -20,7 +20,7 @@ void inner_product(int n, float *x, float *y, float *z)
 int main(void)
 {
     //   Define input vector length
-    int N = 2<<10;
+    int N = 10000;
     std::cout << "Vector size : " << N << std::endl;  
    
     // Initialize float vectors with different float values
@@ -31,8 +31,8 @@ int main(void)
     cudaMallocManaged(&y, N*sizeof(float));
     cudaMallocManaged(&z, N*sizeof(float));
     for (int i = 0; i < N; i++) {
-        x[i] = i;
-        y[i] = i+1;
+        x[i] = 1;
+        y[i] = 2;
         z[i] = 0;
     }
 

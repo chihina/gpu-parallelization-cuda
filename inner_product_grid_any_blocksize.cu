@@ -5,18 +5,19 @@
 #include <iostream>
 #include <numeric>
 #define SIZE_OF_ARRAY(array) (sizeof(array)/sizeof(array[0]))
-#include <cuda_profiler_api.h>
 
 // Define kernel function for inner product
 __global__
 void inner_product(int n, float *x, float *y, float *z)
 {
-    for (int i = 0; i < n; i++)
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+    for (int i = index; i < n; i += stride)
         z[i] = x[i] * y[i];
 }
 
 // Define main function
-int main(void)
+int main(int argc, char *argv[])
 {
     //   Define input vector length
     int N = 10000000;
@@ -49,25 +50,23 @@ int main(void)
     //}
     //std::cout << "]" << std::endl;
 
-    //std::cout << "Initialize vector z: [ ";
-    //for (int i = 0; i < N; i++) {
-    //    std::cout << z[i] << " ";
-    //}
-    //std::cout << "]" << std::endl;
-
     // Execute kernel on vector on the GPU
-    inner_product<<<1, 1>>>(N, x, y, z);
+    int blockSize = atoi(argv[1]);
+    int numBlocks = (N+blockSize-1) / blockSize; 
+
+    std::cout << "CUDA core numbers: " << numBlocks * blockSize << std::endl;
+    inner_product<<<numBlocks, blockSize>>>(N, x, y, z);
 
     // Wait for GPU to finish before accessing on host
     cudaDeviceSynchronize();
 
     float inner_product_value = std::accumulate(z, z + N, 0);
     std::cout << "Inner product (z = (x,y)): " << inner_product_value << std::endl;
-    
+
     // Free memory which is used for vectors
     cudaFree(x);
     cudaFree(y);
     cudaFree(z);
-    
+
     return 0;
 }

@@ -52,7 +52,7 @@ int main(void)
 
     // Execute kernel on vector on the GPU
     int blockSize = 256;
-    int numBlocks = (N+blockSize-1) / blockSize;    
+    int numBlocks = (N+blockSize-1) / blockSize; 
     inner_product<<<numBlocks, blockSize>>>(N, x, y, z);
 
     // Wait for GPU to finish before accessing on host
